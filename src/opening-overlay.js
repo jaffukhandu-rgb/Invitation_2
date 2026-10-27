@@ -60,6 +60,42 @@
 
     let finished = false
     let coverOpen = false
+    let touchStartY = null
+
+    const handleWheel = (event) => {
+      if (!coverOpen) return
+      if (Math.abs(event.deltaY) < 6) return
+      event.preventDefault()
+      enterInvitation()
+    }
+
+    const handleTouchStart = (event) => {
+      touchStartY = event.touches[0]?.clientY ?? null
+    }
+
+    const handleTouchMove = (event) => {
+      if (!coverOpen || touchStartY === null) return
+      const currentY = event.touches[0]?.clientY ?? touchStartY
+      if (Math.abs(touchStartY - currentY) > 14) {
+        event.preventDefault()
+        enterInvitation()
+      }
+    }
+
+    const handleKeydown = (event) => {
+      if (!coverOpen) return
+      if (['ArrowDown', 'PageDown', ' ', 'Enter'].includes(event.key)) {
+        event.preventDefault()
+        enterInvitation()
+      }
+    }
+
+    const cleanup = () => {
+      window.removeEventListener('wheel', handleWheel)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('keydown', handleKeydown)
+    }
 
     const revealInvitation = () => {
       if (finished || coverOpen) return
@@ -70,9 +106,10 @@
       iframe.classList.add('is-cover-ready')
     }
 
-    const enterInvitation = () => {
+    function enterInvitation() {
       if (!coverOpen) return
       coverOpen = false
+      cleanup()
       document.body.classList.remove('opening-locked')
       overlay.classList.add('is-entering')
       iframe.classList.add('is-ready')
@@ -81,33 +118,6 @@
 
     video.addEventListener('ended', revealInvitation, { once: true })
     video.addEventListener('error', revealInvitation, { once: true })
-
-    let touchStartY = null
-    const handleWheel = (event) => {
-      if (!coverOpen) return
-      if (Math.abs(event.deltaY) < 6) return
-      event.preventDefault()
-      enterInvitation()
-    }
-    const handleTouchStart = (event) => {
-      touchStartY = event.touches[0]?.clientY ?? null
-    }
-    const handleTouchMove = (event) => {
-      if (!coverOpen || touchStartY === null) return
-      const currentY = event.touches[0]?.clientY ?? touchStartY
-      if (Math.abs(touchStartY - currentY) > 14) {
-        event.preventDefault()
-        enterInvitation()
-      }
-    }
-    const handleKeydown = (event) => {
-      if (!coverOpen) return
-      if (['ArrowDown', 'PageDown', ' ', 'Enter'].includes(event.key)) {
-        event.preventDefault()
-        enterInvitation()
-      }
-    }
-
     window.addEventListener('wheel', handleWheel, { passive: false })
     window.addEventListener('touchstart', handleTouchStart, { passive: true })
     window.addEventListener('touchmove', handleTouchMove, { passive: false })
