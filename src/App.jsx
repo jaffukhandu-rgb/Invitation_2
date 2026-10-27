@@ -38,6 +38,8 @@ function applyCardTheme(frame) {
       --glass:rgba(245,240,228,.055)!important;--glass-deep:rgba(245,240,228,.09)!important;
       --glass-border:rgba(212,180,108,.34)!important;
     }
+    html,body{scrollbar-width:none!important;-ms-overflow-style:none!important;}
+    html::-webkit-scrollbar,body::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;}
     body{background:linear-gradient(180deg,#17392B 0%,#0B2117 100%)!important}
     #intro{background:radial-gradient(circle at 50% 42%,#28533D 0%,#17392B 56%,#0B2117 100%)!important}
     .hero{background:#17392B!important}
@@ -64,7 +66,6 @@ function applyCardTheme(frame) {
   setText('.hero-date', '8 — 12 · January · 2027')
   setText('.hero-tagline', 'With the blessings of our families, we invite you to celebrate our wedding festivities.')
   setText('.ending-date', '12 · 01 · 2027')
-  setText('#countdown-note', 'Until we gather for the Procession on 12 January 2027')
 
   const story = doc.getElementById('story')
   if (story) story.innerHTML = `
@@ -113,12 +114,36 @@ function applyCardTheme(frame) {
       </div>
     </div>`
 
+  /* Replace the legacy countdown block so its old timer cannot race our new date. */
+  const countdown = doc.getElementById('countdown')
+  if (countdown) countdown.innerHTML = `
+    <div class="section-bg-media"></div><div class="section-bg-overlay"></div>
+    <div class="royal-divider"><span class="rd-line"></span><span class="rd-dot"></span><span class="rd-line right"></span></div>
+    <div class="section-inner">
+      <p class="caps eyebrow reveal in">The Celebrations Begin In</p>
+      <p class="script-heading reveal in">Almost There</p>
+      <h2 class="section-title reveal in">Counting the Days</h2>
+      <p class="section-lede reveal in">The festivities begin with Mehendi on 8th January at Fakhri Baug.</p>
+      <div class="cd-row reveal in">
+        <div class="cd-unit"><span class="cd-num" id="cd-days">00</span><span class="cd-label">Days</span></div>
+        <span class="cd-sep">·</span>
+        <div class="cd-unit"><span class="cd-num" id="cd-hours">00</span><span class="cd-label">Hours</span></div>
+        <span class="cd-sep">·</span>
+        <div class="cd-unit"><span class="cd-num" id="cd-mins">00</span><span class="cd-label">Minutes</span></div>
+        <span class="cd-sep">·</span>
+        <div class="cd-unit"><span class="cd-num" id="cd-secs">00</span><span class="cd-label">Seconds</span></div>
+      </div>
+      <p class="countdown-note reveal in">Until we gather at Fakhri Baug for Mehendi.</p>
+    </div>`
+
   const hint = doc.getElementById('portal-hint')
   if (hint) hint.innerHTML = '<span class="ph-line"></span>Opening your invitation<span class="ph-line"></span>'
   const skip = doc.getElementById('skip-intro')
   if (skip) skip.style.display = 'none'
 
-  const target = new Date('2027-01-12T15:45:00+05:30').getTime()
+  /* Countdown follows the first celebration shown on the original card: Mehendi,
+     Friday 8 January 2027 at 2:30 PM IST. */
+  const target = new Date('2027-01-08T14:30:00+05:30').getTime()
   const updateCountdown = () => {
     const total = Math.max(0, Math.floor((target - Date.now()) / 1000))
     const values = {
