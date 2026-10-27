@@ -136,7 +136,17 @@ function applyCardTheme(frame) {
 
   const autoOpenTimer = window.setTimeout(() => {
     const intro = doc.getElementById('intro')
-    if (intro && !intro.classList.contains('hidden')) doc.getElementById('mono-btn')?.click()
+    const monoButton = doc.getElementById('mono-btn')
+    if (!intro || !monoButton) return
+
+    if (intro.classList.contains('hidden')) {
+      intro.classList.remove('hidden')
+      doc.body.classList.add('locked')
+      doc.getElementById('portal')?.classList.remove('fade')
+      doc.getElementById('portal-hint')?.classList.remove('hide')
+    }
+
+    monoButton.click()
   }, 5000)
 
   return () => { window.clearTimeout(autoOpenTimer); window.clearInterval(countdownTimer) }
