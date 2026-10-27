@@ -43,6 +43,16 @@ function applyCardTheme(frame) {
     body{background:linear-gradient(180deg,#17392B 0%,#0B2117 100%)!important}
     #intro{background:radial-gradient(circle at 50% 42%,#28533D 0%,#17392B 56%,#0B2117 100%)!important}
     .hero{background:#17392B!important}
+    .hero-video{
+      transform:scale(1.04);
+      transform-origin:center center;
+      animation:tmHeroKenBurns 12s ease-in-out infinite alternate;
+      will-change:transform;
+    }
+    @keyframes tmHeroKenBurns{
+      from{transform:scale(1.04) translate3d(0,0,0)}
+      to{transform:scale(1.10) translate3d(0,-.8%,0)}
+    }
     .hero-overlay{background:linear-gradient(180deg,rgba(9,30,20,.25),rgba(9,30,20,.84))!important}
     .hero-date,.hero-tagline,.ending-date{color:var(--gold-light)!important}
     #nav-trigger,#music-toggle{background:#FCF8EF!important;border-color:rgba(184,138,59,.45)!important}
@@ -114,7 +124,6 @@ function applyCardTheme(frame) {
       </div>
     </div>`
 
-  /* Replace the legacy countdown block so its old timer cannot race our new date. */
   const countdown = doc.getElementById('countdown')
   if (countdown) countdown.innerHTML = `
     <div class="section-bg-media"></div><div class="section-bg-overlay"></div>
@@ -136,13 +145,6 @@ function applyCardTheme(frame) {
       <p class="countdown-note reveal in">Until we gather at Fakhri Baug for Mehendi.</p>
     </div>`
 
-  const hint = doc.getElementById('portal-hint')
-  if (hint) hint.innerHTML = '<span class="ph-line"></span>Opening your invitation<span class="ph-line"></span>'
-  const skip = doc.getElementById('skip-intro')
-  if (skip) skip.style.display = 'none'
-
-  /* Countdown follows the first celebration shown on the original card: Mehendi,
-     Friday 8 January 2027 at 2:30 PM IST. */
   const target = new Date('2027-01-08T14:30:00+05:30').getTime()
   const updateCountdown = () => {
     const total = Math.max(0, Math.floor((target - Date.now()) / 1000))
@@ -159,6 +161,22 @@ function applyCardTheme(frame) {
 
   try { frame.contentWindow.localStorage.removeItem('wedding_intro_seen_v8') } catch {}
 
+  const startHeroVideo = () => {
+    const heroVideo = doc.getElementById('hero-video')
+    if (!heroVideo) return
+
+    heroVideo.muted = true
+    heroVideo.autoplay = true
+    heroVideo.loop = true
+    heroVideo.playsInline = true
+    heroVideo.setAttribute('playsinline', '')
+    heroVideo.setAttribute('webkit-playsinline', '')
+
+    const play = () => heroVideo.play().catch(() => {})
+    if (heroVideo.readyState >= 2) play()
+    else heroVideo.addEventListener('canplay', play, { once: true })
+  }
+
   const autoOpenTimer = window.setTimeout(() => {
     const intro = doc.getElementById('intro')
     const monoButton = doc.getElementById('mono-btn')
@@ -172,6 +190,7 @@ function applyCardTheme(frame) {
     }
 
     monoButton.click()
+    window.setTimeout(startHeroVideo, 80)
   }, 5000)
 
   return () => { window.clearTimeout(autoOpenTimer); window.clearInterval(countdownTimer) }
