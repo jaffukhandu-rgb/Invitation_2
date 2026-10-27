@@ -42,6 +42,25 @@ function applyCardTheme(frame) {
     html::-webkit-scrollbar,body::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;}
     body{background:linear-gradient(180deg,#17392B 0%,#0B2117 100%)!important}
     #intro{background:radial-gradient(circle at 50% 42%,#28533D 0%,#17392B 56%,#0B2117 100%)!important}
+
+    /* The wedding cover is a real full-size hero, not a shrinking header. It stays
+       pinned to the viewport while the invitation content scrolls over/after it. */
+    #hero{
+      position:sticky!important;
+      top:0!important;
+      z-index:1!important;
+      min-height:100svh!important;
+      height:100svh!important;
+      overflow:hidden!important;
+    }
+    #hero .hero-main-cover{z-index:1!important;}
+    #hero .hero-main-cover-content{z-index:4!important;}
+    #tm-mini-cover{display:none!important;}
+    #story,#events,#countdown,#venue,#gallery,#rsvp,#ending{
+      position:relative!important;
+      z-index:2!important;
+    }
+
     .hero{background:#17392B!important}
     .hero-video{
       transform:scale(1.04);
