@@ -42,20 +42,7 @@
             .hero-main-cover-date{font-family:var(--font-caps);font-size:9px;letter-spacing:.28em;color:#D4B46C;margin-top:24px;text-transform:uppercase}
             .hero-main-cover-divider{display:flex;align-items:center;gap:12px;margin-top:22px}.hero-main-cover-divider span{width:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(212,180,108,.72))}.hero-main-cover-divider span:last-child{background:linear-gradient(90deg,rgba(212,180,108,.72),transparent)}.hero-main-cover-divider b{font-size:9px;color:#D4B46C;font-weight:400}
             .hero-main-cover-cue{margin-top:46px;font-family:var(--font-caps);font-size:8px;letter-spacing:.34em;color:rgba(245,240,228,.68);display:flex;flex-direction:column;align-items:center;gap:9px}.hero-main-cover-cue:after{content:"";width:1px;height:30px;background:linear-gradient(180deg,rgba(212,180,108,.8),transparent)}
-
-            .tm-mini-cover{position:fixed;top:0;left:0;right:0;height:66px;z-index:9998;display:flex;align-items:center;justify-content:center;padding:0 54px;background:rgba(11,33,23,.96);border-bottom:1px solid rgba(212,180,108,.34);box-shadow:0 8px 28px rgba(0,0,0,.18);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .16s ease,visibility .16s ease;box-sizing:border-box}
-            .tm-mini-cover.is-visible{opacity:1;visibility:visible}
-            .tm-mini-cover-frame{position:absolute;inset:7px 10px;border:1px solid rgba(212,180,108,.26);pointer-events:none}
-            .tm-mini-cover-content{display:flex;align-items:center;justify-content:center;gap:12px;white-space:nowrap;color:#F5F0E4}
-            .tm-mini-cover-script{font-family:var(--font-script);font-size:17px;color:#D4B46C;line-height:1}
-            .tm-mini-cover-names{font-family:var(--font-serif);font-size:22px;line-height:1;color:#F5F0E4;letter-spacing:.01em}
-            .tm-mini-cover-names i{font-family:var(--font-script);font-style:normal;font-size:15px;color:#D4B46C;margin:0 5px}
-            .tm-mini-cover-date{font-family:var(--font-caps);font-size:7px;letter-spacing:.2em;color:#D4B46C;text-transform:uppercase}
-            .tm-mini-cover-line{width:28px;height:1px;background:linear-gradient(90deg,transparent,rgba(212,180,108,.7))}
-            @media(max-width:640px){
-              .hero-main-cover-frame{inset:10px}.hero-main-cover-content{padding-top:54px;padding-bottom:38px}.hero-main-cover-cue{margin-top:40px}
-              .tm-mini-cover{height:58px;padding:0 38px}.tm-mini-cover-frame{inset:6px 8px}.tm-mini-cover-content{gap:8px}.tm-mini-cover-script{font-size:14px}.tm-mini-cover-names{font-size:18px}.tm-mini-cover-names i{font-size:12px;margin:0 3px}.tm-mini-cover-date{font-size:6px;letter-spacing:.16em}.tm-mini-cover-line{width:18px}
-            }
+            @media(max-width:640px){.hero-main-cover-frame{inset:10px}.hero-main-cover-content{padding-top:54px;padding-bottom:38px}.hero-main-cover-cue{margin-top:40px}}
           `
           doc.head.appendChild(style)
         }
@@ -82,35 +69,6 @@
           </div>
         `
 
-        let mini = doc.getElementById('tm-mini-cover')
-        if (!mini) {
-          mini = doc.createElement('div')
-          mini.id = 'tm-mini-cover'
-          mini.className = 'tm-mini-cover'
-          mini.setAttribute('aria-hidden', 'true')
-          mini.innerHTML = `
-            <span class="tm-mini-cover-frame"></span>
-            <div class="tm-mini-cover-content">
-              <span class="tm-mini-cover-script">The wedding of</span>
-              <span class="tm-mini-cover-names">Taha <i>&amp;</i> Munira</span>
-              <span class="tm-mini-cover-line"></span>
-              <span class="tm-mini-cover-date">8 — 12 · January · 2027</span>
-            </div>
-          `
-          doc.body.appendChild(mini)
-        }
-
-        const updateMiniCover = () => {
-          const y = doc.documentElement.scrollTop || doc.body.scrollTop || 0
-          mini.classList.toggle('is-visible', y > 48)
-        }
-
-        if (doc.defaultView) {
-          doc.defaultView.removeEventListener('scroll', updateMiniCover)
-          doc.defaultView.addEventListener('scroll', updateMiniCover, { passive: true })
-          updateMiniCover()
-        }
-
         const coverVideo = hero.querySelector('.hero-main-cover-video')
         if (!coverVideo) return
 
@@ -130,8 +88,52 @@
     if (!document.getElementById('taha-munira-parent-cover-style')) {
       const parentStyle = document.createElement('style')
       parentStyle.id = 'taha-munira-parent-cover-style'
-      parentStyle.textContent = `.invitation-iframe.is-cover-ready{opacity:1!important;transform:scale(1)!important}`
+      parentStyle.textContent = `
+        .tm-mini-cover{position:fixed;top:0;left:0;right:0;height:64px;z-index:9999;display:flex;align-items:center;justify-content:center;padding:0 44px;box-sizing:border-box;background:rgba(11,33,23,.97);border-bottom:1px solid rgba(212,180,108,.38);box-shadow:0 8px 28px rgba(0,0,0,.22);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-100%);transition:opacity .24s ease,transform .32s ease,visibility .24s ease}
+        .tm-mini-cover.is-visible{opacity:1;visibility:visible;transform:translateY(0)}
+        .tm-mini-cover-frame{position:absolute;inset:7px 10px;border:1px solid rgba(212,180,108,.25);pointer-events:none}
+        .tm-mini-cover-content{display:flex;align-items:center;justify-content:center;gap:12px;white-space:nowrap;color:#F5F0E4}
+        .tm-mini-cover-script{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:15px;color:#D4B46C}
+        .tm-mini-cover-names{font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#F5F0E4;letter-spacing:.01em}
+        .tm-mini-cover-names i{font-style:italic;font-size:15px;color:#D4B46C;margin:0 5px}
+        .tm-mini-cover-date{font-family:Arial,sans-serif;font-size:7px;letter-spacing:.2em;color:#D4B46C;text-transform:uppercase}
+        .tm-mini-cover-line{width:28px;height:1px;background:linear-gradient(90deg,transparent,rgba(212,180,108,.7))}
+        @media(max-width:640px){.tm-mini-cover{height:58px;padding:0 18px}.tm-mini-cover-frame{inset:6px 8px}.tm-mini-cover-content{gap:7px}.tm-mini-cover-script{display:none}.tm-mini-cover-names{font-size:19px}.tm-mini-cover-names i{font-size:13px;margin:0 3px}.tm-mini-cover-date{font-size:6px;letter-spacing:.13em}.tm-mini-cover-line{width:16px}}
+      `
       document.head.appendChild(parentStyle)
+    }
+
+    const miniCover = document.createElement('div')
+    miniCover.id = 'tm-mini-cover'
+    miniCover.className = 'tm-mini-cover'
+    miniCover.setAttribute('aria-hidden', 'true')
+    miniCover.innerHTML = `
+      <span class="tm-mini-cover-frame"></span>
+      <div class="tm-mini-cover-content">
+        <span class="tm-mini-cover-script">The wedding of</span>
+        <span class="tm-mini-cover-names">Taha <i>&amp;</i> Munira</span>
+        <span class="tm-mini-cover-line"></span>
+        <span class="tm-mini-cover-date">8 — 12 · January · 2027</span>
+      </div>
+    `
+    document.body.appendChild(miniCover)
+
+    let miniScrollCleanup = null
+    const setupMiniCoverScroll = () => {
+      miniScrollCleanup?.()
+      const win = iframe.contentWindow
+      if (!win) return
+      const updateMiniCover = () => {
+        const y = Math.max(win.scrollY || 0, iframe.contentDocument?.documentElement?.scrollTop || 0, iframe.contentDocument?.body?.scrollTop || 0)
+        miniCover.classList.toggle('is-visible', y > Math.max(48, win.innerHeight * 0.12))
+      }
+      win.addEventListener('scroll', updateMiniCover, { passive:true })
+      win.addEventListener('resize', updateMiniCover, { passive:true })
+      updateMiniCover()
+      miniScrollCleanup = () => {
+        win.removeEventListener('scroll', updateMiniCover)
+        win.removeEventListener('resize', updateMiniCover)
+      }
     }
 
     const overlay = document.createElement('div')
@@ -176,7 +178,9 @@
     document.body.classList.add('opening-locked')
 
     iframe.addEventListener('load', hideLegacyIntro)
+    iframe.addEventListener('load', setupMiniCoverScroll)
     hideLegacyIntro()
+    setupMiniCoverScroll()
 
     let finished = false
     let coverOpen = false
@@ -189,9 +193,7 @@
       enterInvitation()
     }
 
-    const handleTouchStart = (event) => {
-      touchStartY = event.touches[0]?.clientY ?? null
-    }
+    const handleTouchStart = (event) => { touchStartY = event.touches[0]?.clientY ?? null }
 
     const handleTouchMove = (event) => {
       if (!coverOpen || touchStartY === null) return
@@ -204,7 +206,7 @@
 
     const handleKeydown = (event) => {
       if (!coverOpen) return
-      if (['ArrowDown', 'PageDown', ' ', 'Enter'].includes(event.key)) {
+      if (['ArrowDown','PageDown',' ','Enter'].includes(event.key)) {
         event.preventDefault()
         enterInvitation()
       }
@@ -215,6 +217,7 @@
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('keydown', handleKeydown)
+      miniScrollCleanup?.()
     }
 
     const revealInvitation = () => {
@@ -231,39 +234,36 @@
       if (!coverOpen) return
       coverOpen = false
       cleanup()
+      setupMiniCoverScroll()
       document.body.classList.remove('opening-locked')
       overlay.classList.add('is-entering')
       iframe.classList.add('is-ready')
       window.setTimeout(() => overlay.remove(), 1250)
     }
 
-    video.addEventListener('ended', revealInvitation, { once: true })
-    video.addEventListener('error', revealInvitation, { once: true })
-    window.addEventListener('wheel', handleWheel, { passive: false })
-    window.addEventListener('touchstart', handleTouchStart, { passive: true })
-    window.addEventListener('touchmove', handleTouchMove, { passive: false })
+    video.addEventListener('ended', revealInvitation, { once:true })
+    video.addEventListener('error', revealInvitation, { once:true })
+    window.addEventListener('wheel', handleWheel, { passive:false })
+    window.addEventListener('touchstart', handleTouchStart, { passive:true })
+    window.addEventListener('touchmove', handleTouchMove, { passive:false })
     window.addEventListener('keydown', handleKeydown)
 
     const playVideo = () => video.play().catch(() => {})
     if (video.readyState >= 2) playVideo()
-    else video.addEventListener('canplay', playVideo, { once: true })
+    else video.addEventListener('canplay', playVideo, { once:true })
 
     return true
   }
 
   const start = () => {
     if (init()) return
-
     const observer = new MutationObserver(() => {
       if (init()) observer.disconnect()
     })
-    observer.observe(document.getElementById('root') || document.body, { childList: true, subtree: true })
+    observer.observe(document.getElementById('root') || document.body, { childList:true, subtree:true })
     window.setTimeout(() => observer.disconnect(), 10000)
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start, { once: true })
-  } else {
-    start()
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once:true })
+  else start()
 })()
