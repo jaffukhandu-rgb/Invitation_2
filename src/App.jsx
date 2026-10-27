@@ -82,6 +82,80 @@ function applyCardTheme(frame) {
     .royal-copy p+p{margin-top:12px}.family-emphasis{color:var(--gold-light);font-family:var(--font-serif);font-size:1.15rem}
     .royal-request{padding-top:18px;border-top:1px solid rgba(212,180,108,.2)}.royal-request .caps{margin-bottom:8px}
     .royal-request p:last-child{color:var(--text-ivory)}
+
+    /* Countdown: compact, readable, and centered on mobile without changing its logic. */
+    #countdown .section-inner{
+      max-width:720px!important;
+      padding-top:clamp(54px,9vw,86px)!important;
+      padding-bottom:clamp(52px,9vw,84px)!important;
+    }
+    #countdown .eyebrow{margin-bottom:10px!important;letter-spacing:.22em!important;font-size:.68rem!important;}
+    #countdown .script-heading{margin-bottom:6px!important;line-height:1.05!important;}
+    #countdown .section-title{margin-bottom:14px!important;line-height:1.1!important;}
+    #countdown .section-lede{
+      max-width:44ch!important;
+      margin:0 auto!important;
+      line-height:1.65!important;
+      opacity:.78!important;
+    }
+    #countdown .cd-row{
+      width:min(100%,620px)!important;
+      margin:32px auto 0!important;
+      padding:22px 18px!important;
+      display:flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      gap:clamp(8px,2.5vw,20px)!important;
+      border-top:1px solid rgba(212,180,108,.24)!important;
+      border-bottom:1px solid rgba(212,180,108,.24)!important;
+    }
+    #countdown .cd-unit{
+      min-width:68px!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:center!important;
+      gap:7px!important;
+    }
+    #countdown .cd-num{
+      font-family:var(--font-serif)!important;
+      font-size:clamp(2rem,6vw,3.25rem)!important;
+      line-height:.95!important;
+      color:var(--ivory)!important;
+      font-variant-numeric:tabular-nums!important;
+      letter-spacing:.02em!important;
+    }
+    #countdown .cd-label{
+      color:var(--gold-light)!important;
+      font-size:.62rem!important;
+      line-height:1!important;
+      text-transform:uppercase!important;
+      letter-spacing:.18em!important;
+      opacity:.9!important;
+    }
+    #countdown .cd-sep{
+      color:var(--gold)!important;
+      font-size:1.2rem!important;
+      opacity:.75!important;
+      transform:translateY(-5px)!important;
+    }
+    #countdown .countdown-note{
+      margin:22px auto 0!important;
+      max-width:40ch!important;
+      color:var(--text-ivory-soft)!important;
+      font-size:.84rem!important;
+      line-height:1.65!important;
+      font-style:italic!important;
+      text-align:center!important;
+    }
+    @media(max-width:480px){
+      #countdown .section-inner{padding-top:46px!important;padding-bottom:48px!important;}
+      #countdown .cd-row{margin-top:26px!important;padding:19px 8px!important;gap:6px!important;}
+      #countdown .cd-unit{min-width:56px!important;gap:6px!important;}
+      #countdown .cd-num{font-size:2rem!important;}
+      #countdown .cd-label{font-size:.52rem!important;letter-spacing:.12em!important;}
+      #countdown .cd-sep{font-size:1rem!important;}
+    }
+
     @media(max-width:640px){.section{padding-left:20px!important;padding-right:20px!important}.t-card{padding:21px 20px!important}.venue-grid{gap:16px!important}.venue-card{padding:24px 21px!important}}
   `
   doc.head.appendChild(style)
