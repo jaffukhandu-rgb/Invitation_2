@@ -161,39 +161,7 @@ function applyCardTheme(frame) {
 
   try { frame.contentWindow.localStorage.removeItem('wedding_intro_seen_v8') } catch {}
 
-  const startHeroVideo = () => {
-    const heroVideo = doc.getElementById('hero-video')
-    if (!heroVideo) return
-
-    heroVideo.muted = true
-    heroVideo.autoplay = true
-    heroVideo.loop = true
-    heroVideo.playsInline = true
-    heroVideo.setAttribute('playsinline', '')
-    heroVideo.setAttribute('webkit-playsinline', '')
-
-    const play = () => heroVideo.play().catch(() => {})
-    if (heroVideo.readyState >= 2) play()
-    else heroVideo.addEventListener('canplay', play, { once: true })
-  }
-
-  const autoOpenTimer = window.setTimeout(() => {
-    const intro = doc.getElementById('intro')
-    const monoButton = doc.getElementById('mono-btn')
-    if (!intro || !monoButton) return
-
-    if (intro.classList.contains('hidden')) {
-      intro.classList.remove('hidden')
-      doc.body.classList.add('locked')
-      doc.getElementById('portal')?.classList.remove('fade')
-      doc.getElementById('portal-hint')?.classList.remove('hide')
-    }
-
-    monoButton.click()
-    window.setTimeout(startHeroVideo, 80)
-  }, 5000)
-
-  return () => { window.clearTimeout(autoOpenTimer); window.clearInterval(countdownTimer) }
+  return () => window.clearInterval(countdownTimer)
 }
 
 export default function App() {
