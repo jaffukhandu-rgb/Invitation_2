@@ -43,14 +43,13 @@ function applyCardTheme(frame) {
     body{background:linear-gradient(180deg,#17392B 0%,#0B2117 100%)!important}
     #intro{background:radial-gradient(circle at 50% 42%,#28533D 0%,#17392B 56%,#0B2117 100%)!important}
 
-    /* The wedding cover is a real full-size hero, not a shrinking header. It stays
-       pinned to the viewport while the invitation content scrolls over/after it. */
+    /* The royal cover is a normal first section. Later sections must never overlap it. */
     #hero{
-      position:sticky!important;
-      top:0!important;
-      z-index:1!important;
-      min-height:100svh!important;
-      height:100svh!important;
+      position:relative!important;
+      top:auto!important;
+      z-index:auto!important;
+      min-height:72svh!important;
+      height:72svh!important;
       overflow:hidden!important;
     }
     #hero .hero-main-cover{z-index:1!important;}
@@ -58,7 +57,7 @@ function applyCardTheme(frame) {
     #tm-mini-cover{display:none!important;}
     #story,#events,#countdown,#venue,#gallery,#rsvp,#ending{
       position:relative!important;
-      z-index:2!important;
+      z-index:auto!important;
     }
 
     .hero{background:#17392B!important}
