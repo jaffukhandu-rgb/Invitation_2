@@ -1,7 +1,7 @@
 (() => {
   const init = () => {
     const iframe = document.querySelector('.invitation-iframe')
-    if (!iframe) return
+    if (!iframe) return false
 
     const hideLegacyIntro = () => {
       try {
@@ -13,9 +13,6 @@
         doc.getElementById('nav-trigger')?.classList.add('show')
       } catch {}
     }
-
-    iframe.addEventListener('load', hideLegacyIntro, { once: true })
-    hideLegacyIntro()
 
     const overlay = document.createElement('div')
     overlay.className = 'opening-overlay'
@@ -37,27 +34,43 @@
     overlay.append(video, sheen)
     document.body.appendChild(overlay)
 
+    iframe.addEventListener('load', hideLegacyIntro)
+    hideLegacyIntro()
+
     let finished = false
     const revealInvitation = () => {
       if (finished) return
       finished = true
       hideLegacyIntro()
-      overlay.classList.add('is-ending')
       iframe.classList.add('is-ready')
+      overlay.classList.add('is-ending')
       window.setTimeout(() => overlay.remove(), 1100)
     }
 
     video.addEventListener('ended', revealInvitation, { once: true })
     video.addEventListener('error', revealInvitation, { once: true })
 
-    video.play().catch(() => {
-      window.addEventListener('load', () => video.play().catch(revealInvitation), { once: true })
+    const playVideo = () => video.play().catch(() => {})
+    if (video.readyState >= 2) playVideo()
+    else video.addEventListener('canplay', playVideo, { once: true })
+
+    return true
+  }
+
+  const start = () => {
+    if (init()) return
+
+    const observer = new MutationObserver(() => {
+      if (init()) observer.disconnect()
     })
+    observer.observe(document.getElementById('root') || document.body, { childList: true, subtree: true })
+
+    window.setTimeout(() => observer.disconnect(), 10000)
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true })
+    document.addEventListener('DOMContentLoaded', start, { once: true })
   } else {
-    init()
+    start()
   }
 })()
