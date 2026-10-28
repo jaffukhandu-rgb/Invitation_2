@@ -62,8 +62,9 @@
     }
 
     const handleReplayClick = (event) => {
-      const target = event.target instanceof Element ? event.target : null
-      const control = target?.closest('button, a, [role="button"]')
+      const target = event.target
+      if (!target || target.nodeType !== 1) return
+      const control = target.closest('button, a, [role="button"]')
       if (!control) return
       const label = `${control.textContent || ''} ${control.getAttribute('aria-label') || ''}`.trim()
       if (!/replay/i.test(label)) return
