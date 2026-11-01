@@ -5,7 +5,6 @@
     '/assets/wedding-photos/bg-ending.jpg'
   ]
   const CHANGE_EVERY = 2000
-  const FADE_MS = 750
 
   const installGalleryLoop = () => {
     const iframe = document.querySelector('.invitation-iframe')
@@ -16,31 +15,33 @@
         const doc = iframe.contentDocument
         if (!doc) return false
 
-        const sections = [...doc.querySelectorAll('section, .section')]
-        const gallerySection = sections.find(section =>
-          /celebrations\s+unfold/i.test(section.textContent || '')
-        )
-        if (!gallerySection) return false
+        const gallerySection = doc.getElementById('gallery')
+        const grid = gallerySection?.querySelector('.gallery-grid')
+        if (!gallerySection || !grid) return false
+        if (grid.dataset.tahaGalleryLoop === 'true') return true
 
-        const media = gallerySection.querySelector('.section-bg-media')
-        if (!media) return false
-        if (media.dataset.tahaGalleryLoop === 'true') return true
-
-        media.dataset.tahaGalleryLoop = 'true'
-        media.innerHTML = ''
+        grid.dataset.tahaGalleryLoop = 'true'
+        grid.innerHTML = ''
 
         const styleId = 'taha-gallery-loop-style'
         if (!doc.getElementById(styleId)) {
           const style = doc.createElement('style')
           style.id = styleId
           style.textContent = `
+            .gallery .section-bg-media,
+            .gallery .section-bg-overlay{display:none!important}
+            .gallery .section-inner{width:100%!important;max-width:600px!important}
+            .gallery-grid{display:block!important;width:100%!important;margin:34px auto 0!important}
             .taha-gallery-loop{
-              position:absolute!important;
-              inset:0!important;
+              position:relative!important;
               width:100%!important;
-              height:100%!important;
+              max-width:560px!important;
+              aspect-ratio:4/3!important;
+              margin:0 auto!important;
               overflow:hidden!important;
               background:#102a20!important;
+              border:1px solid var(--glass-border)!important;
+              box-shadow:0 18px 40px rgba(0,0,0,.28)!important;
             }
             .taha-gallery-loop img{
               position:absolute!important;
@@ -50,20 +51,20 @@
               object-fit:cover!important;
               object-position:center!important;
               opacity:0!important;
-              transform:scale(1.015)!important;
-              transition:opacity .75s ease,transform 3.8s ease!important;
-              will-change:opacity,transform!important;
+              transition:opacity .65s ease!important;
+              will-change:opacity!important;
             }
-            .taha-gallery-loop img.is-active{
-              opacity:1!important;
-              transform:scale(1)!important;
-            }
+            .taha-gallery-loop img.is-active{opacity:1!important}
             .taha-gallery-loop::after{
               content:"";
               position:absolute;
               inset:0;
               pointer-events:none;
-              background:linear-gradient(180deg,rgba(5,25,17,.18),rgba(5,25,17,.30) 55%,rgba(5,25,17,.72));
+              background:linear-gradient(180deg,rgba(5,25,17,.08),rgba(5,25,17,.28) 55%,rgba(5,25,17,.58));
+            }
+            @media(max-width:640px){
+              .gallery-grid{margin-top:28px!important}
+              .taha-gallery-loop{width:100%!important;aspect-ratio:4/3!important;max-height:330px!important}
             }
           `
           doc.head.appendChild(style)
@@ -76,15 +77,14 @@
         PHOTOS.forEach((src, index) => {
           const img = doc.createElement('img')
           img.src = src
-          img.alt = ''
+          img.alt = 'Wedding memory'
           img.loading = index === 0 ? 'eager' : 'lazy'
           img.decoding = 'async'
-          img.setAttribute('aria-hidden', 'true')
           if (index === 0) img.classList.add('is-active')
           loop.appendChild(img)
         })
 
-        media.appendChild(loop)
+        grid.appendChild(loop)
 
         const images = [...loop.querySelectorAll('img')]
         let active = 0
@@ -107,14 +107,11 @@
           timer = null
         }
 
-        loop.addEventListener('mouseenter', stop)
-        loop.addEventListener('mouseleave', start)
         document.addEventListener('visibilitychange', () => {
           if (document.hidden) stop()
           else start()
         })
 
-        images[0]?.addEventListener('load', start, { once: true })
         start()
         return true
       } catch {
