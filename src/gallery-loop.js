@@ -5,6 +5,7 @@
     '/assets/wedding-photos/bg-ending.jpg'
   ]
   const CHANGE_EVERY = 2000
+  const CASCADE_MS = 900
 
   const installGalleryLoop = () => {
     const iframe = document.querySelector('.invitation-iframe')
@@ -45,6 +46,7 @@
               background:#102a20!important;
               border:1px solid var(--glass-border)!important;
               box-shadow:0 18px 40px rgba(0,0,0,.28)!important;
+              perspective:900px!important;
             }
             .taha-gallery-slot{
               position:relative!important;
@@ -53,6 +55,13 @@
               overflow:hidden!important;
               background:rgba(245,238,227,.055)!important;
               border:1px solid rgba(199,164,106,.22)!important;
+              transform:translate3d(0,0,0) scale(1) rotate(0deg)!important;
+              transform-origin:center center!important;
+              transition:
+                transform .42s cubic-bezier(.22,.8,.25,1),
+                box-shadow .42s ease,
+                z-index 0s linear!important;
+              will-change:transform!important;
             }
             .taha-gallery-slot img{
               position:absolute!important;
@@ -63,15 +72,41 @@
               object-fit:contain!important;
               object-position:center!important;
               background:#102a20!important;
-              opacity:0!important;
-              transition:opacity .65s ease!important;
-              will-change:opacity!important;
             }
-            .taha-gallery-slot img.is-active{opacity:1!important}
+            .taha-gallery-slot:nth-child(1){z-index:1!important}
+            .taha-gallery-slot:nth-child(2){z-index:3!important}
+            .taha-gallery-slot:nth-child(3){z-index:2!important}
+
+            /* Physical photo-card cascade: each card briefly lifts, shifts and settles. */
+            .taha-gallery-loop.is-cascading .taha-gallery-slot:nth-child(1){
+              transform:translate3d(10px,-7px,0) rotate(1.8deg) scale(.98)!important;
+              box-shadow:12px 16px 24px rgba(0,0,0,.28)!important;
+              z-index:2!important;
+            }
+            .taha-gallery-loop.is-cascading .taha-gallery-slot:nth-child(2){
+              transform:translate3d(0,-13px,0) rotate(-1.2deg) scale(1.045)!important;
+              box-shadow:0 20px 30px rgba(0,0,0,.38)!important;
+              z-index:4!important;
+              transition-delay:.10s!important;
+            }
+            .taha-gallery-loop.is-cascading .taha-gallery-slot:nth-child(3){
+              transform:translate3d(-10px,-7px,0) rotate(1.4deg) scale(.98)!important;
+              box-shadow:-12px 16px 24px rgba(0,0,0,.28)!important;
+              z-index:3!important;
+              transition-delay:.20s!important;
+            }
+
             @media(max-width:640px){
               .gallery-grid{margin-top:28px!important}
               .taha-gallery-loop{gap:6px!important;padding:6px!important}
               .taha-gallery-slot{aspect-ratio:3/4!important}
+              .taha-gallery-loop.is-cascading .taha-gallery-slot:nth-child(1){transform:translate3d(5px,-5px,0) rotate(1.2deg) scale(.985)!important}
+              .taha-gallery-loop.is-cascading .taha-gallery-slot:nth-child(2){transform:translate3d(0,-9px,0) rotate(-.9deg) scale(1.035)!important}
+              .taha-gallery-loop.is-cascading .taha-gallery-slot:nth-child(3){transform:translate3d(-5px,-5px,0) rotate(1deg) scale(.985)!important}
+            }
+
+            @media(prefers-reduced-motion:reduce){
+              .taha-gallery-slot{transition:none!important}
             }
           `
           doc.head.appendChild(style)
@@ -89,7 +124,6 @@
           img.alt = 'Wedding memory'
           img.loading = index === 0 ? 'eager' : 'lazy'
           img.decoding = 'async'
-          img.classList.add('is-active')
           slot.appendChild(img)
           loop.appendChild(slot)
           return slot
@@ -100,26 +134,37 @@
         const images = slots.map(slot => slot.querySelector('img'))
         let offset = 0
         let timer = null
+        let animationTimer = null
 
         const showNextSet = () => {
-          images.forEach((img, slotIndex) => {
-            img.classList.remove('is-active')
-            const nextPhoto = (slotIndex + offset + 1) % PHOTOS.length
-            img.src = PHOTOS[nextPhoto]
-            window.requestAnimationFrame(() => img.classList.add('is-active'))
-          })
-          offset = (offset + 1) % PHOTOS.length
+          loop.classList.add('is-cascading')
+
+          window.clearTimeout(animationTimer)
+          animationTimer = window.setTimeout(() => {
+            offset = (offset + 1) % PHOTOS.length
+
+            images.forEach((img, slotIndex) => {
+              const nextPhoto = (slotIndex + offset) % PHOTOS.length
+              img.src = PHOTOS[nextPhoto]
+            })
+
+            loop.classList.remove('is-cascading')
+          }, CASCADE_MS)
         }
 
         const start = () => {
-          if (timer) return
+          if (timer || images.length < 2) return
           timer = window.setInterval(showNextSet, CHANGE_EVERY)
         }
 
         const stop = () => {
-          if (!timer) return
-          window.clearInterval(timer)
-          timer = null
+          if (timer) {
+            window.clearInterval(timer)
+            timer = null
+          }
+          window.clearTimeout(animationTimer)
+          animationTimer = null
+          loop.classList.remove('is-cascading')
         }
 
         document.addEventListener('visibilitychange', () => {
