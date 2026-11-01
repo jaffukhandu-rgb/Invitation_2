@@ -75,6 +75,18 @@
       }
     }
 
+    const startAfterInvitationOpens = () => {
+      if (document.body.classList.contains('opening-locked')) return
+      window.startWeddingMusic?.()
+      window.removeEventListener('wheel', startAfterInvitationOpens)
+      window.removeEventListener('touchmove', startAfterInvitationOpens)
+      window.removeEventListener('keydown', startAfterInvitationOpens)
+    }
+
+    window.addEventListener('wheel', startAfterInvitationOpens, { passive: true })
+    window.addEventListener('touchmove', startAfterInvitationOpens, { passive: true })
+    window.addEventListener('keydown', startAfterInvitationOpens)
+
     audio.addEventListener('play', syncButton)
     audio.addEventListener('pause', syncButton)
     audio.addEventListener('ended', syncButton)
