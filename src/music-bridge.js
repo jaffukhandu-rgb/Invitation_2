@@ -8,12 +8,7 @@
     window.removeEventListener('pointerdown', startLegacyMusic, true)
     window.removeEventListener('click', startLegacyMusic, true)
     window.removeEventListener('touchstart', startLegacyMusic, true)
-    window.removeEventListener('wheel', startLegacyMusic, true)
-    window.removeEventListener('touchmove', startLegacyMusic, true)
     window.removeEventListener('keydown', startLegacyMusic, true)
-    window.removeEventListener('pageshow', startLegacyMusic, true)
-    window.removeEventListener('focus', startLegacyMusic, true)
-    document.removeEventListener('visibilitychange', startLegacyMusic, true)
     if (iframe) iframe.removeEventListener('load', startLegacyMusic)
     if (retryTimer) {
       window.clearInterval(retryTimer)
@@ -29,12 +24,12 @@
     iframe ||= document.querySelector('.invitation-iframe')
     if (!iframe) return
 
-    // Tell the browser that this same-origin iframe is allowed to request autoplay.
+    // Keep autoplay permission on the iframe. This does not bypass browser policy,
+    // but it removes the iframe permission as a possible blocker.
     iframe.allow = 'autoplay'
 
     try {
-      const doc = iframe.contentDocument
-      const music = doc?.getElementById('bg-music')
+      const music = iframe.contentDocument?.getElementById('bg-music')
       if (!music) return
 
       music.loop = true
@@ -42,16 +37,17 @@
       music.autoplay = true
       music.muted = false
       music.volume = 1
-      music.load()
 
+      // IMPORTANT: do not call load() here. Calling load() immediately before play()
+      // can break the transient user-activation window on some mobile browsers.
       const promise = music.play()
       if (promise && typeof promise.then === 'function') {
         promise.then(() => {
           started = true
           cleanup()
         }).catch(() => {
-          // Audible autoplay may still be rejected by the browser. Keep retrying
-          // so the first real user gesture can start the same existing audio.
+          // Expected when the browser blocks audible autoplay. The next real gesture
+          // will call play() again while preserving the same existing audio element.
         })
       } else {
         started = true
@@ -68,20 +64,16 @@
 
     iframe.allow = 'autoplay'
 
-    // Capture the opening interaction before the overlay consumes it.
+    // Capture the user's very first interaction at the parent level. The opening
+    // overlay sits above the iframe, so the iframe itself cannot reliably receive it.
     window.addEventListener('pointerdown', startLegacyMusic, true)
     window.addEventListener('click', startLegacyMusic, true)
     window.addEventListener('touchstart', startLegacyMusic, { passive: true, capture: true })
-    window.addEventListener('wheel', startLegacyMusic, { passive: true, capture: true })
-    window.addEventListener('touchmove', startLegacyMusic, { passive: true, capture: true })
     window.addEventListener('keydown', startLegacyMusic, true)
-    window.addEventListener('pageshow', startLegacyMusic, true)
-    window.addEventListener('focus', startLegacyMusic, true)
-    document.addEventListener('visibilitychange', startLegacyMusic, true)
     iframe.addEventListener('load', startLegacyMusic)
 
-    // Attempt immediately on link open, when the iframe becomes ready, and during
-    // the opening animation. If autoplay is allowed, music starts without a tap.
+    // Best-effort audible autoplay on page open. If the browser permits it, this
+    // starts immediately. If not, the first user gesture starts it reliably.
     startLegacyMusic()
     retryTimer = window.setInterval(startLegacyMusic, 1000)
 
