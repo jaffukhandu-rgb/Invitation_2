@@ -34,37 +34,44 @@
             .gallery-grid{display:block!important;width:100%!important;margin:34px auto 0!important}
             .taha-gallery-loop{
               position:relative!important;
+              display:grid!important;
+              grid-template-columns:repeat(3,minmax(0,1fr))!important;
+              gap:8px!important;
               width:100%!important;
               max-width:560px!important;
-              aspect-ratio:4/3!important;
               margin:0 auto!important;
+              padding:8px!important;
               overflow:hidden!important;
               background:#102a20!important;
               border:1px solid var(--glass-border)!important;
               box-shadow:0 18px 40px rgba(0,0,0,.28)!important;
             }
-            .taha-gallery-loop img{
+            .taha-gallery-slot{
+              position:relative!important;
+              aspect-ratio:3/4!important;
+              min-width:0!important;
+              overflow:hidden!important;
+              background:rgba(245,238,227,.055)!important;
+              border:1px solid rgba(199,164,106,.22)!important;
+            }
+            .taha-gallery-slot img{
               position:absolute!important;
               inset:0!important;
               width:100%!important;
               height:100%!important;
-              object-fit:cover!important;
+              display:block!important;
+              object-fit:contain!important;
               object-position:center!important;
+              background:#102a20!important;
               opacity:0!important;
               transition:opacity .65s ease!important;
               will-change:opacity!important;
             }
-            .taha-gallery-loop img.is-active{opacity:1!important}
-            .taha-gallery-loop::after{
-              content:"";
-              position:absolute;
-              inset:0;
-              pointer-events:none;
-              background:linear-gradient(180deg,rgba(5,25,17,.08),rgba(5,25,17,.28) 55%,rgba(5,25,17,.58));
-            }
+            .taha-gallery-slot img.is-active{opacity:1!important}
             @media(max-width:640px){
               .gallery-grid{margin-top:28px!important}
-              .taha-gallery-loop{width:100%!important;aspect-ratio:4/3!important;max-height:330px!important}
+              .taha-gallery-loop{gap:6px!important;padding:6px!important}
+              .taha-gallery-slot{aspect-ratio:3/4!important}
             }
           `
           doc.head.appendChild(style)
@@ -74,31 +81,39 @@
         loop.className = 'taha-gallery-loop'
         loop.setAttribute('aria-label', 'Wedding memories')
 
-        PHOTOS.forEach((src, index) => {
+        const slots = PHOTOS.map((src, index) => {
+          const slot = doc.createElement('div')
+          slot.className = 'taha-gallery-slot'
           const img = doc.createElement('img')
           img.src = src
           img.alt = 'Wedding memory'
           img.loading = index === 0 ? 'eager' : 'lazy'
           img.decoding = 'async'
-          if (index === 0) img.classList.add('is-active')
-          loop.appendChild(img)
+          img.classList.add('is-active')
+          slot.appendChild(img)
+          loop.appendChild(slot)
+          return slot
         })
 
         grid.appendChild(loop)
 
-        const images = [...loop.querySelectorAll('img')]
-        let active = 0
+        const images = slots.map(slot => slot.querySelector('img'))
+        let offset = 0
         let timer = null
 
-        const showNext = () => {
-          images[active]?.classList.remove('is-active')
-          active = (active + 1) % images.length
-          images[active]?.classList.add('is-active')
+        const showNextSet = () => {
+          images.forEach((img, slotIndex) => {
+            img.classList.remove('is-active')
+            const nextPhoto = (slotIndex + offset + 1) % PHOTOS.length
+            img.src = PHOTOS[nextPhoto]
+            window.requestAnimationFrame(() => img.classList.add('is-active'))
+          })
+          offset = (offset + 1) % PHOTOS.length
         }
 
         const start = () => {
-          if (timer || images.length < 2) return
-          timer = window.setInterval(showNext, CHANGE_EVERY)
+          if (timer) return
+          timer = window.setInterval(showNextSet, CHANGE_EVERY)
         }
 
         const stop = () => {
