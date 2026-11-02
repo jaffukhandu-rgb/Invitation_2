@@ -6,7 +6,14 @@
 
     if (!venue) return false
 
-    venue.style.display = 'none'
+    const duplicateHeader = venue.querySelector('.section-inner')
+    if (!duplicateHeader) return false
+
+    venue.querySelector('.royal-divider')?.remove()
+    venue.querySelector('.eyebrow')?.remove()
+    venue.querySelector('.script-heading')?.remove()
+    venue.querySelector('.section-title')?.remove()
+    venue.querySelector('.section-lede')?.remove()
     return true
   }
 
