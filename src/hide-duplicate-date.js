@@ -1,19 +1,12 @@
 (() => {
-  const hideDuplicateDateBlock = () => {
+  const hideDuplicateDate = () => {
     const iframe = document.querySelector('.invitation-iframe')
     const doc = iframe?.contentDocument
-    const venue = doc?.getElementById('venue')
+    const heroDate = doc?.querySelector('.hero-date')
 
-    if (!venue) return false
+    if (!heroDate) return false
 
-    const duplicateHeader = venue.querySelector('.section-inner')
-    if (!duplicateHeader) return false
-
-    venue.querySelector('.royal-divider')?.remove()
-    venue.querySelector('.eyebrow')?.remove()
-    venue.querySelector('.script-heading')?.remove()
-    venue.querySelector('.section-title')?.remove()
-    venue.querySelector('.section-lede')?.remove()
+    heroDate.style.display = 'none'
     return true
   }
 
@@ -22,11 +15,11 @@
     if (!iframe) return false
 
     iframe.addEventListener('load', () => {
-      hideDuplicateDateBlock()
-      window.setTimeout(hideDuplicateDateBlock, 0)
-    }, { passive: true })
+      hideDuplicateDate()
+      window.setTimeout(hideDuplicateDate, 0)
+    })
 
-    hideDuplicateDateBlock()
+    hideDuplicateDate()
     return true
   }
 
