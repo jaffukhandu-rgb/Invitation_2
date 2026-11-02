@@ -6,8 +6,10 @@
 
   const cleanup = () => {
     window.removeEventListener('pointerdown', startLegacyMusic, true)
+    window.removeEventListener('pointerup', startLegacyMusic, true)
     window.removeEventListener('click', startLegacyMusic, true)
     window.removeEventListener('touchstart', startLegacyMusic, true)
+    window.removeEventListener('touchend', startLegacyMusic, true)
     window.removeEventListener('keydown', startLegacyMusic, true)
     if (iframe) iframe.removeEventListener('load', startLegacyMusic)
     if (retryTimer) {
@@ -46,8 +48,8 @@
           started = true
           cleanup()
         }).catch(() => {
-          // Expected when the browser blocks audible autoplay. The next real gesture
-          // will call play() again while preserving the same existing audio element.
+          // Expected when the browser blocks audible autoplay. A real user gesture
+          // such as touch/pointer release will try again while activation is valid.
         })
       } else {
         started = true
@@ -64,16 +66,18 @@
 
     iframe.allow = 'autoplay'
 
-    // Capture the user's very first interaction at the parent level. The opening
-    // overlay sits above the iframe, so the iframe itself cannot reliably receive it.
+    // Capture the opening interaction at the parent level. The opening overlay sits
+    // above the iframe, so the iframe itself cannot reliably receive it.
     window.addEventListener('pointerdown', startLegacyMusic, true)
+    window.addEventListener('pointerup', startLegacyMusic, true)
     window.addEventListener('click', startLegacyMusic, true)
     window.addEventListener('touchstart', startLegacyMusic, { passive: true, capture: true })
+    window.addEventListener('touchend', startLegacyMusic, { passive: true, capture: true })
     window.addEventListener('keydown', startLegacyMusic, true)
     iframe.addEventListener('load', startLegacyMusic)
 
     // Best-effort audible autoplay on page open. If the browser permits it, this
-    // starts immediately. If not, the first user gesture starts it reliably.
+    // starts immediately. If not, the opening swipe/tap can unlock it.
     startLegacyMusic()
     retryTimer = window.setInterval(startLegacyMusic, 1000)
 
